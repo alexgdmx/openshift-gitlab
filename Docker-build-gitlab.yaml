@@ -1,0 +1,27 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: gitlab-docker
+spec:
+  runPolicy: Serial
+  triggers:
+    - type: GitHub
+      github:
+        secret: 34721224bb7386d7
+    - type: Generic
+      generic:
+        secret: bf403561dc8c78b8
+    - type: ImageChange
+  source:
+    git:
+      uri: 'https://github.com/alexgdmx/openshift-gitlab.git'
+  strategy:
+    type: Docker
+    dockerStrategy:
+      from:
+        kind: DockerImage
+        name: 'ubuntu:16.04'
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'gitlab-docker:latest'

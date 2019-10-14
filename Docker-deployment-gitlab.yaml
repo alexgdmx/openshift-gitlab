@@ -1,0 +1,44 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: demo-01-docker
+spec:
+  replicas: 1
+  selector:
+    deploymentconfig: demo-01-docker
+  strategy:
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: demo-01-docker
+        deploymentconfig: demo-01-docker
+    spec:
+      containers:
+        - image:
+          imagePullPolicy: Always
+          name: demo-01-docker
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - demo-01-docker
+        from:
+          kind: ImageStreamTag
+          name: 'demo-01-docker:latest'
+        lastTriggeredImage:
+      type: ImageChange
+    - type: ConfigChange
